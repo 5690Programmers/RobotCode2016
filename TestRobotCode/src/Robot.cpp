@@ -8,20 +8,21 @@
 #include <SmartDashboard/SmartDashboard.h>
 #include <RobotDrive.h>
 #include <Timer.h>
-#include <Victor.h>
+#include <VictorSP.h>
 #include <DIgitalInput.h>
-
+#include <Relay.h>
+#include <CameraServer.h>
 
 class Robot: public SampleRobot
 {
 	RobotDrive myRobot {3, 2, 1 ,0};
 	Joystick stick {0};
-    VictorSP MainShooterRight {7};
-    VictorSP MainShooterLeft {8};
-    VictorSP MainShooterAngle {6};
-    VictorSP Arm {5};
-    Relay Trigger {0, Relay::Direction::kBothDirections};
-    DigitalInput LimtSwitch {5};
+    frc::VictorSP MainShooterRight {7};
+    frc::VictorSP MainShooterLeft {8};
+    frc::VictorSP MainShooterAngle {6};
+    frc::VictorSP Arm {5};
+    frc::Relay Trigger {0, Relay::Direction::kBothDirections};
+    frc::DigitalInput LimtSwitch {5};
 
 	frc::SendableChooser<std::string> chooser;
 	const std::string autoNameDefault = "Default";
@@ -29,8 +30,6 @@ class Robot: public SampleRobot
 
 public:
 	Robot(){
-		myRobot.SetExpiration(0.1);
-	{
 		//Note SmartDashboard is not initialized here, wait until RobotInit to make SmartDashboard calls
 		myRobot.SetExpiration(0.1);
 	}
@@ -38,8 +37,9 @@ public:
 	void RobotInit()
 	{
 		chooser.AddObject(autoNameDefault, autoNameDefault);
-				chooser.AddObject(autoNameCustom, autoNameCustom);
-				SmartDashboard::PutData("Auto Modes", &chooser);
+		chooser.AddObject(autoNameCustom, autoNameCustom);
+		SmartDashboard::PutData("Auto Modes", &chooser);
+		frc::CameraServer::GetInstance()->StartAutomaticCapture();
 	}
 
 	/**
@@ -53,7 +53,7 @@ public:
 	 */
 	void Autonomous()
 	{
-		std::string autoSelected = *((std::string*)chooser->GetSelected());
+		auto autoSelected = chooser.GetSelected();
 		//std::string autoSelected = SmartDashboard::GetString("Auto Selector", autoNameDefault);
 		std::cout << "Auto selected: " << autoSelected << std::endl;
 
