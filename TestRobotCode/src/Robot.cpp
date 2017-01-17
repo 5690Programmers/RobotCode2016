@@ -1,32 +1,35 @@
-#include "WPILib.h"
+#include <iostream>
+#include <memory>
+#include <string>
+
+#include <Joystick.h>
+#include <SampleRobot.h>
+#include <SmartDashboard/SendableChooser.h>
+#include <SmartDashboard/SmartDashboard.h>
+#include <RobotDrive.h>
+#include <Timer.h>
+#include <Victor.h>
+#include <DIgitalInput.h>
+
 
 class Robot: public SampleRobot
 {
-	RobotDrive myRobot;
-	Joystick stick;
-    VictorSP MainShooterRight;
-    VictorSP MainShooterLeft;
-    VictorSP MainShooterAngle;
-    VictorSP Arm;
-    Relay Trigger;
-    DigitalInput LimtSwitch;
-    //This is here to test
+	RobotDrive myRobot {3, 2, 1 ,0};
+	Joystick stick {0};
+    VictorSP MainShooterRight {7};
+    VictorSP MainShooterLeft {8};
+    VictorSP MainShooterAngle {6};
+    VictorSP Arm {5};
+    Relay Trigger {0, Relay::Direction::kBothDirections};
+    DigitalInput LimtSwitch {5};
 
-	SendableChooser *chooser;
+	frc::SendableChooser<std::string> chooser;
 	const std::string autoNameDefault = "Default";
 	const std::string autoNameCustom = "My Auto";
 
 public:
-	Robot() :
-			myRobot(3, 2, 1, 0),
-			stick(0),
-            MainShooterRight(7),
-            MainShooterLeft(8),
-			MainShooterAngle(6),
-            Arm(5),
-			Trigger(0, Relay::Direction::kBothDirections),
-            LimtSwitch(5),
-			chooser()
+	Robot(){
+		myRobot.SetExpiration(0.1);
 	{
 		//Note SmartDashboard is not initialized here, wait until RobotInit to make SmartDashboard calls
 		myRobot.SetExpiration(0.1);
@@ -34,10 +37,9 @@ public:
 
 	void RobotInit()
 	{
-		chooser = new SendableChooser();
-		chooser->AddDefault(autoNameDefault, (void*)&autoNameDefault);
-		chooser->AddObject(autoNameCustom, (void*)&autoNameCustom);
-		SmartDashboard::PutData("Auto Modes", chooser);
+		chooser.AddObject(autoNameDefault, autoNameDefault);
+				chooser.AddObject(autoNameCustom, autoNameCustom);
+				SmartDashboard::PutData("Auto Modes", &chooser);
 	}
 
 	/**
