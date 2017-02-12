@@ -1,3 +1,5 @@
+//Robot name is Steven!
+
 #include <iostream>
 #include <memory>
 #include <string>
@@ -12,6 +14,7 @@
 #include <DIgitalInput.h>
 #include <Relay.h>
 #include <CameraServer.h>
+#include <ADXRS450_Gyro.h>
 
 class Robot: public SampleRobot
 {
@@ -24,14 +27,21 @@ class Robot: public SampleRobot
     frc::Relay Trigger {0, Relay::Direction::kBothDirections};
     frc::DigitalInput LimtSwitch {5};
 
+
 	frc::SendableChooser<std::string> chooser;
 	const std::string autoNameDefault = "Default";
 	const std::string autoNameCustom = "My Auto";
 
+	frc::ADXRS450_Gyro gyro;
+
+
 public:
-	Robot(){
-		//Note SmartDashboard is not initialized here, wait until RobotInit to make SmartDashboard calls
+	std::shared_ptr<NetworkTable> Steven;
+	Robot() {
+		Steven->SetClientMode();
+		Steven = NetworkTable::GetTable("database");    //Change database to the location of the vision code
 		myRobot.SetExpiration(0.1);
+
 	}
 
 	void RobotInit()
@@ -40,6 +50,23 @@ public:
 		chooser.AddObject(autoNameCustom, autoNameCustom);
 		SmartDashboard::PutData("Auto Modes", &chooser);
 		frc::CameraServer::GetInstance()->StartAutomaticCapture();
+
+
+		std::cout << "Areas: ";
+		//get the array with an empty array as default value
+		std::vector<double> arr = Steven->GetNumberArray("area", llvm::ArrayRef<double>());
+		for (unsigned int i = 0; i < arr.size(); i++) {
+			std::cout << arr[i] << " ";
+		}
+		std::cout << std::endl;
+		Wait(1);
+
+		gyro.Reset();
+		Steven->SetTeam(5690);
+		Steven->Initialize();
+		Steven->SetUpdateRate(0.3);
+		Steven->SetPort(5800);
+		Steven->SetIPAddress("10.56.90.2");
 	}
 
 	/**
@@ -80,11 +107,20 @@ public:
 	 */
 	void OperatorControl()
 	{
+		double x = 0;
+		double y = 0;
 		myRobot.SetSafetyEnabled(true);
 		while (IsOperatorControl() && IsEnabled())
 		{
 			float stickY = (float)stick.GetY();//converting to float
 			float stickX = (float)stick.GetX();
+
+			Wait(1.0);
+			Steven->PutNumber("X", x);
+			Steven->PutNumber("Y", y);
+			x += 0.25;
+			y += 0.25;
+
 
 			myRobot.ArcadeDrive(stickY, -stickX); // drive with arcade style (use right stick)
 
