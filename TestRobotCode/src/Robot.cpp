@@ -36,7 +36,7 @@ class Robot: public SampleRobot
 
 
 public:
-	std::shared_ptr<NetworkTable> Steven;
+	std::shared_ptr<NetworkTable> Steven;;
 	Robot() {
 		Steven->SetClientMode();
 		Steven = NetworkTable::GetTable("database");    //Change database to the location of the vision code
@@ -52,14 +52,15 @@ public:
 		frc::CameraServer::GetInstance()->StartAutomaticCapture();
 
 
-		std::cout << "Areas: ";
+		//std::cout << "Areas: ";
 		//get the array with an empty array as default value
-		std::vector<double> arr = Steven->GetNumberArray("area", llvm::ArrayRef<double>());
-		for (unsigned int i = 0; i < arr.size(); i++) {
-			std::cout << arr[i] << " ";
-		}
-		std::cout << std::endl;
-		Wait(1);
+		//bool FOund;
+		//FOund = Steven->GetBoolean()("found");
+		//for (unsigned int i = 0; i < arr.size(); i++) {
+		//	std::cout << arr[i] << " ";
+		//}
+		//std::cout << std::endl;
+		//Wait(1);
 
 		gyro.Reset();
 		Steven->SetTeam(5690);
